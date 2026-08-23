@@ -20,10 +20,13 @@
   "homepage": "https://github.com/Abhigna09/retailpilot#readme",
   "dependencies": {
     "@google/genai": "^2.18.0",
+    "aws-cdk-lib": "^2.266.0",
+    "constructs": "^10.8.1",
     "dotenv": "^17.4.2",
     "razorpay": "^2.9.8"
   },
   "devDependencies": {
+    "esbuild": "^0.28.2",
     "tsx": "^4.23.12"
   }
 }
