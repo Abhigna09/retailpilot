@@ -18,7 +18,7 @@ export async function handler(event: any) {
     const body: ExecutePaymentInput = JSON.parse(event.body);
     const { product, vendor, request, recentOrders, poAmount } = body;
 
-    const auditEntry = await executeVendorPayment(
+        const auditEntry = await executeVendorPayment(
       product,
       vendor,
       request,
@@ -26,9 +26,15 @@ export async function handler(event: any) {
       poAmount
     );
 
+    let notification = null;
+    if (auditEntry.success) {
+      const { notifyVendor } = await import("../services/notificationService");
+      notification = notifyVendor(vendor, product, request.quantity, poAmount);
+    }
+
     return {
       statusCode: auditEntry.success ? 200 : 403,
-      body: JSON.stringify(auditEntry),
+      body: JSON.stringify({ ...auditEntry, notification }),
     };
   } catch (err) {
     return {
