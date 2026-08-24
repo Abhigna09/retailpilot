@@ -1,0 +1,8 @@
+{
+  "sales": [
+    { "saleId": "s1", "productId": "2d3091f5-b2ac-4398-85ed-2b4acb842af6", "date": "2026-08-20", "unitsSold": 18 },
+    { "saleId": "s2", "productId": "2d3091f5-b2ac-4398-85ed-2b4acb842af6", "date": "2026-08-21", "unitsSold": 16 },
+    { "saleId": "s3", "productId": "2d3091f5-b2ac-4398-85ed-2b4acb842af6", "date": "2026-08-22", "unitsSold": 19 }
+  ],
+  "expiryBatches": []
+}

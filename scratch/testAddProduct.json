@@ -1,0 +1,11 @@
+{
+  "userId": "9b628d3b-b15c-459e-99d2-0dac8ad4ceca",
+  "name": "Orange Juice 1L",
+  "vendorId": "eb3c27c4-cc3b-48b6-8fa9-ab95097ce421",
+  "category": "perishable",
+  "costPrice": 60,
+  "sellPrice": 90,
+  "currentStock": 100,
+  "autopayEnabled": true,
+  "autopayThreshold": 5000
+}

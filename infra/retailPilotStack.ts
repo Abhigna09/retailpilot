@@ -55,12 +55,85 @@ export class RetailPilotStack extends cdk.Stack {
       },
     });
 
-    const analyze = api.root.addResource("analyze");
+       const analyze = api.root.addResource("analyze");
     analyze.addMethod("POST", new apigateway.LambdaIntegration(analyzeFn));
 
     const pay = api.root.addResource("pay");
     pay.addMethod("POST", new apigateway.LambdaIntegration(paymentFn));
 
+    // Auth
+    const signupFn = new lambda.NodejsFunction(this, "SignupFn", {
+      entry: path.join(__dirname, "../src/handlers/auth.ts"),
+      handler: "signupHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    const loginFn = new lambda.NodejsFunction(this, "LoginFn", {
+      entry: path.join(__dirname, "../src/handlers/auth.ts"),
+      handler: "loginHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    table.grantReadWriteData(signupFn);
+    table.grantReadWriteData(loginFn);
+
+    const auth = api.root.addResource("auth");
+    const signupRes = auth.addResource("signup");
+    signupRes.addMethod("POST", new apigateway.LambdaIntegration(signupFn));
+    const loginRes = auth.addResource("login");
+    loginRes.addMethod("POST", new apigateway.LambdaIntegration(loginFn));
+
+    // Onboarding
+    const addProductFn = new lambda.NodejsFunction(this, "AddProductFn", {
+      entry: path.join(__dirname, "../src/handlers/onboarding.ts"),
+      handler: "addProductHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    const addVendorFn = new lambda.NodejsFunction(this, "AddVendorFn", {
+      entry: path.join(__dirname, "../src/handlers/onboarding.ts"),
+      handler: "addVendorHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    const listProductsFn = new lambda.NodejsFunction(this, "ListProductsFn", {
+      entry: path.join(__dirname, "../src/handlers/onboarding.ts"),
+      handler: "listProductsHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    const listVendorsFn = new lambda.NodejsFunction(this, "ListVendorsFn", {
+      entry: path.join(__dirname, "../src/handlers/onboarding.ts"),
+      handler: "listVendorsHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    table.grantReadWriteData(addProductFn);
+    table.grantReadWriteData(addVendorFn);
+    table.grantReadWriteData(listProductsFn);
+    table.grantReadWriteData(listVendorsFn);
+
+    const productsRes = api.root.addResource("products");
+    productsRes.addMethod("POST", new apigateway.LambdaIntegration(addProductFn));
+    productsRes.addMethod("GET", new apigateway.LambdaIntegration(listProductsFn));
+
+    const vendorsRes = api.root.addResource("vendors");
+    vendorsRes.addMethod("POST", new apigateway.LambdaIntegration(addVendorFn));
+    vendorsRes.addMethod("GET", new apigateway.LambdaIntegration(listVendorsFn));
+
+    // Review (analysis + approval combined)
+    const reviewFn = new lambda.NodejsFunction(this, "ReviewProductFn", {
+      entry: path.join(__dirname, "../src/handlers/reviewProduct.ts"),
+      handler: "handler",
+      environment: sharedEnv,
+      timeout: cdk.Duration.seconds(30),
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    table.grantReadWriteData(reviewFn);
+
+    const reviewRes = api.root.addResource("review");
+    reviewRes.addMethod("POST", new apigateway.LambdaIntegration(reviewFn));
+
     new cdk.CfnOutput(this, "ApiUrl", { value: api.url });
-  }
+}
 }
