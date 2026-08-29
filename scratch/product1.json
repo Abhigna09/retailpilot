@@ -1,0 +1,11 @@
+{
+  "userId": "a96d53f7-f829-4578-98e7-d084f4ba3341",
+  "name": "Milk 1L",
+  "vendorId": "e4d7c1ea-3a36-4c6a-9b97-aef5dcd415a4",
+  "category": "dairy",
+  "costPrice": 40,
+  "sellPrice": 55,
+  "currentStock": 15,
+  "autopayEnabled": true,
+  "autopayThreshold": 3000
+}

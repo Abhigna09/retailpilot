@@ -1,0 +1,11 @@
+{
+  "userId": "a96d53f7-f829-4578-98e7-d084f4ba3341",
+  "name": "Cooking Oil 1L",
+  "vendorId": "5922e6e5-8c07-4309-8f6d-998f1d2f85e4",
+  "category": "dry-goods",
+  "costPrice": 140,
+  "sellPrice": 180,
+  "currentStock": 25,
+  "autopayEnabled": true,
+  "autopayThreshold": 8000
+}

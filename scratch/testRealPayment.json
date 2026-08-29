@@ -1,0 +1,29 @@
+{
+  "product": {
+    "productId": "2d3091f5-b2ac-4398-85ed-2b4acb842af6",
+    "name": "Orange Juice 1L",
+    "vendorId": "eb3c27c4-cc3b-48b6-8fa9-ab95097ce421",
+    "costPrice": 60,
+    "sellPrice": 90,
+    "currentStock": 100,
+    "createdAt": "2026-08-24T12:49:16.809Z"
+  },
+  "vendor": {
+    "vendorId": "eb3c27c4-cc3b-48b6-8fa9-ab95097ce421",
+    "name": "FreshJuice Distributors",
+    "leadTimeDays": 4,
+    "paymentMethod": "razorpay",
+    "contactEmail": "orders@freshjuice.com",
+    "contactPhone": "+919876543210",
+    "bankAccountLast4": "4521"
+  },
+  "request": {
+    "productId": "2d3091f5-b2ac-4398-85ed-2b4acb842af6",
+    "vendorId": "eb3c27c4-cc3b-48b6-8fa9-ab95097ce421",
+    "quantity": 28,
+    "unitCost": 60,
+    "requestedAt": "2026-08-25T13:00:00.000Z"
+  },
+  "recentOrders": [],
+  "poAmount": 1680
+}

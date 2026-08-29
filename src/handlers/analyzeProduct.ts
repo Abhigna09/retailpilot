@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { jsonResponse } from "../shared/response";
 import { Product } from "../models/product";
 import { Vendor } from "../models/vendor";
 import { Sale } from "../models/sale";
@@ -71,17 +72,8 @@ export async function handler(event: any) {
   try {
     const body: AnalyzeInput = JSON.parse(event.body);
     const output = await analyzeProduct(body);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify(output),
-    };
+    return jsonResponse(200, output);
   } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        error: err instanceof Error ? err.message : String(err),
-      }),
-    };
+    return jsonResponse(500, { error: err instanceof Error ? err.message : String(err) });
   }
 }

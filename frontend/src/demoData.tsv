@@ -1,0 +1,44 @@
+// Consistent demo sales/expiry patterns per product, so the dashboard
+// badge and the detail screen always agree. Real sales-tracking module
+// is future scope (see HLD) — this simulates realistic variety.
+
+function hashId(id: string): number {
+  let sum = 0;
+  for (let i = 0; i < id.length; i++) sum += id.charCodeAt(i);
+  return sum % 3;
+}
+
+export function generateDemoSales(productId: string) {
+  const pattern = hashId(productId); // 0 = fast-moving, 1 = moderate, 2 = dead stock
+  const sales = [];
+  const today = new Date();
+
+  for (let i = 13; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toISOString().split("T")[0];
+
+    let units = 0;
+    if (pattern === 0) units = Math.floor(15 + (13 - i) * 0.3 + Math.random() * 4);
+    else if (pattern === 1) units = Math.floor(4 + Math.random() * 3);
+    else units = i > 3 ? 0 : Math.floor(Math.random() * 1); // dead stock — no recent sales
+
+    sales.push({ saleId: `s-${productId}-${i}`, productId, date: dateStr, unitsSold: units });
+  }
+  return sales;
+}
+
+export function generateDemoExpiry(productId: string, currentStock: number) {
+  const pattern = hashId(productId);
+  if (pattern !== 0) return []; // only fast-movers get a demo expiry batch, for variety
+
+  const d = new Date();
+  d.setDate(d.getDate() + 6);
+
+  return [{
+    batchId: `b-${productId}`,
+    productId,
+    quantity: Math.floor(currentStock * 0.3),
+    expiryDate: d.toISOString().split("T")[0],
+  }];
+}
