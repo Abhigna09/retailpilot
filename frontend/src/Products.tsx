@@ -13,7 +13,6 @@ export default function Products({ userId }: Props) {
   const [costPrice, setCostPrice] = useState("");
   const [currentStock, setCurrentStock] = useState("");
   const [unit, setUnit] = useState("");
-  const [avgDailySales, setAvgDailySales] = useState("");
   const [vendorId, setVendorId] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -50,7 +49,6 @@ export default function Products({ userId }: Props) {
     setCostPrice("");
     setCurrentStock("");
     setUnit("");
-    setAvgDailySales("");
     refresh();
   }
 

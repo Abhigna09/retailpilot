@@ -19,7 +19,7 @@ export default function Analysis({ userId, onOpenProduct }: Props) {
   const [checked, setChecked] = useState<CheckedProduct[]>([]);
   const [tab, setTab] = useState<"attention" | "healthy">("attention");
   const [loading, setLoading] = useState(true);
-  const [totalSales, setTotalSales] = useState(0);
+  
 
   useEffect(() => {
     load();
