@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import { User } from "../models/user";
-import { putItem, getItem, queryByPrefix } from "./dbClient";
+import { putItem, getItem } from "./dbClient";
 
 export interface SignupInput {
   email: string;
@@ -12,6 +12,7 @@ export interface SignupInput {
 export interface AuthResult {
   success: boolean;
   userId?: string;
+  storeName?: string;
   reason: string;
 }
 
@@ -32,7 +33,7 @@ export async function signup(input: SignupInput): Promise<AuthResult> {
     createdAt: new Date().toISOString(),
   };
 
-    await putItem({
+  await putItem({
     PK: `USER#${userId}`,
     SK: "PROFILE",
     ...user,
@@ -44,8 +45,9 @@ export async function signup(input: SignupInput): Promise<AuthResult> {
     userId,
   });
 
-  return { success: true, userId, reason: "Account created." };
+  return { success: true, userId, storeName: user.storeName, reason: "Account created." };
 }
+
 export async function login(email: string, password: string): Promise<AuthResult> {
   const user = await findUserByEmail(email);
   if (!user) {
@@ -57,15 +59,10 @@ export async function login(email: string, password: string): Promise<AuthResult
     return { success: false, reason: "Incorrect password." };
   }
 
-  return { success: true, userId: user.userId, reason: "Login successful." };
+  return { success: true, userId: user.userId, storeName: user.storeName, reason: "Login successful." };
 }
 
-// simple scan-by-email helper (fine at hackathon scale, not for millions of users)
 async function findUserByEmail(email: string): Promise<User | undefined> {
-  // NOTE: since our table is single-PK-per-user, we can't query by email directly
-  // without a GSI. For now, this requires userId to already be known, OR
-  // we accept email lookup requires a GSI (added in infra later).
-  // Simplified for hackathon: store email->userId mapping as a separate item.
   const mapping = await getItem(`EMAIL#${email}`, "MAPPING");
   if (!mapping) return undefined;
   const profile = await getItem(`USER#${mapping.userId}`, "PROFILE");

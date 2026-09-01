@@ -75,3 +75,13 @@ export async function executeVendorPayment(
     };
   }
 }
+export function previewSafetyChecks(
+  product: Product,
+  vendor: Vendor,
+  request: ReorderRequest,
+  recentOrders: ReorderRequest[],
+  poAmount: number,
+  maxAutoSpend: number = 10000
+): SafetyCheckResult[] {
+  return runAllSafetyChecks(product, vendor, request, recentOrders, poAmount, maxAutoSpend);
+}

@@ -37,11 +37,12 @@ export class RetailPilotStack extends cdk.Stack {
 
     // Lambda 2: execute payment
     const paymentFn = new lambda.NodejsFunction(this, "ExecutePaymentFn", {
-      entry: path.join(__dirname, "../src/handlers/executePayment.ts"),
-      handler: "handler",
-      environment: sharedEnv,
-      timeout: cdk.Duration.seconds(30),
-    });
+  entry: path.join(__dirname, "../src/handlers/executePayment.ts"),
+  handler: "handler",
+  environment: sharedEnv,
+  timeout: cdk.Duration.seconds(30),
+  runtime: lambda_.Runtime.NODEJS_20_X,
+});
 
     table.grantReadWriteData(analyzeFn);
     table.grantReadWriteData(paymentFn);
@@ -133,6 +134,101 @@ export class RetailPilotStack extends cdk.Stack {
 
     const reviewRes = api.root.addResource("review");
     reviewRes.addMethod("POST", new apigateway.LambdaIntegration(reviewFn));
+
+        // Sales & expiry tracking
+    const recordSaleFn = new lambda.NodejsFunction(this, "RecordSaleFn", {
+      entry: path.join(__dirname, "../src/handlers/tracking.ts"),
+      handler: "recordSaleHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    const listSalesFn = new lambda.NodejsFunction(this, "ListSalesFn", {
+      entry: path.join(__dirname, "../src/handlers/tracking.ts"),
+      handler: "listSalesHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    const addExpiryFn = new lambda.NodejsFunction(this, "AddExpiryFn", {
+      entry: path.join(__dirname, "../src/handlers/tracking.ts"),
+      handler: "addExpiryHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    const listExpiryFn = new lambda.NodejsFunction(this, "ListExpiryFn", {
+      entry: path.join(__dirname, "../src/handlers/tracking.ts"),
+      handler: "listExpiryHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    table.grantReadWriteData(recordSaleFn);
+    table.grantReadWriteData(listSalesFn);
+    table.grantReadWriteData(addExpiryFn);
+    table.grantReadWriteData(listExpiryFn);
+
+    const salesRes = api.root.addResource("sales");
+    salesRes.addMethod("POST", new apigateway.LambdaIntegration(recordSaleFn));
+    salesRes.addMethod("GET", new apigateway.LambdaIntegration(listSalesFn));
+
+    const expiryRes = api.root.addResource("expiry");
+    expiryRes.addMethod("POST", new apigateway.LambdaIntegration(addExpiryFn));
+    expiryRes.addMethod("GET", new apigateway.LambdaIntegration(listExpiryFn));
+
+        // Lightweight status check — no AI, used by dashboard list
+    const checkStatusFn = new lambda.NodejsFunction(this, "CheckStatusFn", {
+      entry: path.join(__dirname, "../src/handlers/checkStatus.ts"),
+      handler: "handler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    table.grantReadWriteData(checkStatusFn);
+
+    const statusRes = api.root.addResource("status");
+    statusRes.addMethod("GET", new apigateway.LambdaIntegration(checkStatusFn));
+
+        // Real audit trail — lists all persisted AgentActions for a user
+    const listActionsFn = new lambda.NodejsFunction(this, "ListActionsFn", {
+      entry: path.join(__dirname, "../src/handlers/actions.ts"),
+      handler: "handler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    table.grantReadWriteData(listActionsFn);
+
+    const actionsRes = api.root.addResource("actions");
+    actionsRes.addMethod("GET", new apigateway.LambdaIntegration(listActionsFn));
+
+        // List-all endpoints for Sales History and Product Expiry pages
+    const listAllSalesFn = new lambda.NodejsFunction(this, "ListAllSalesFn", {
+      entry: path.join(__dirname, "../src/handlers/tracking.ts"),
+      handler: "listAllSalesHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    const listAllExpiryFn = new lambda.NodejsFunction(this, "ListAllExpiryFn", {
+      entry: path.join(__dirname, "../src/handlers/tracking.ts"),
+      handler: "listAllExpiryHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    table.grantReadWriteData(listAllSalesFn);
+    table.grantReadWriteData(listAllExpiryFn);
+
+    const allSalesRes = salesRes.addResource("all");
+    allSalesRes.addMethod("GET", new apigateway.LambdaIntegration(listAllSalesFn));
+
+    const allExpiryRes = expiryRes.addResource("all");
+    allExpiryRes.addMethod("GET", new apigateway.LambdaIntegration(listAllExpiryFn));
+
+    // Preview safety checks — dry run, no state change
+    const previewChecksFn = new lambda.NodejsFunction(this, "PreviewChecksFn", {
+      entry: path.join(__dirname, "../src/handlers/previewChecks.ts"),
+      handler: "handler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+
+    const previewRes = api.root.addResource("preview-checks");
+    previewRes.addMethod("POST", new apigateway.LambdaIntegration(previewChecksFn));
 
     new cdk.CfnOutput(this, "ApiUrl", { value: api.url });
 }

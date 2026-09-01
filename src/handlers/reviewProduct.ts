@@ -27,18 +27,36 @@ export async function handler(event: any) {
       return jsonResponse(404, { error: "Vendor not found" });
     }
 
-    const body = event.body ? JSON.parse(event.body) : {};
-    const sales: Sale[] = body.sales || [];
-    const expiryBatches: ExpiryBatch[] = body.expiryBatches || [];
+        const { listSales } = await import("../services/salesService");
+    const { listExpiryBatches } = await import("../services/expiryService");
 
-    const analysis = await analyzeProduct({ product, vendor, sales, expiryBatches });
+    const sales: Sale[] = await listSales(userId, productId);
+    const expiryBatches: ExpiryBatch[] = await listExpiryBatches(userId, productId);
+
+        const analysis = await analyzeProduct({ product, vendor, sales, expiryBatches });
 
     let approval = null;
+    let action = null;
+
     if (analysis.reorder.result.reorderNeeded) {
       approval = decideApprovalRoute(product, analysis.reorder.result);
+
+      const { createAction } = await import("../services/agentActionService");
+      action = await createAction({
+        userId,
+        productId: product.productId,
+        productName: product.name,
+        vendorId: vendor.vendorId,
+        type: "reorder",
+        reasoning: analysis.reorder.explanation,
+        recommendedQty: analysis.reorder.result.recommendedQty,
+        orderAmount: approval.orderAmount,
+        decisionOutcome: approval.autoApproved ? "autonomous" : "approval_required",
+        status: "awaiting_approval",
+      });
     }
 
-    return jsonResponse(200, { product, vendor, analysis, approval });
+    return jsonResponse(200, { product, vendor, analysis, approval, action });
   } catch (err) {
     return jsonResponse(500, { error: err instanceof Error ? err.message : String(err) });
   }

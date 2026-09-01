@@ -6,6 +6,7 @@ import { putItem, queryByPrefix } from "./dbClient";
 export interface AddProductInput {
   userId: string;
   name: string;
+  unit: string;
   vendorId: string;
   category: ProductCategory;
   costPrice: number;
@@ -25,10 +26,11 @@ export interface AddVendorInput {
 }
 
 export async function addProduct(input: AddProductInput): Promise<Product> {
-  const product: Product = {
+    const product: Product = {
     productId: randomUUID(),
     userId: input.userId,
     name: input.name,
+    unit: input.unit,
     vendorId: input.vendorId,
     category: input.category,
     costPrice: input.costPrice,
