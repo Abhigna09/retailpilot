@@ -50,6 +50,7 @@ export async function executeVendorPayment(
   }
 
   // all checks passed — proceed with real Razorpay call
+    // all checks passed — proceed with real Razorpay call
   try {
     const order = await razorpay.orders.create({
       amount: poAmount * 100, // Razorpay expects paise, not rupees
@@ -61,6 +62,15 @@ export async function executeVendorPayment(
       },
     });
 
+    // real reorder means real stock increase — update the product record
+    const { putItem } = await import("./dbClient");
+    const newStock = product.currentStock + request.quantity;
+    await putItem({
+      PK: `USER#${product.userId}`,
+      SK: `PRODUCT#${product.productId}`,
+      ...product,
+      currentStock: newStock,
+    });
     return {
       ...baseLog,
       success: true,
