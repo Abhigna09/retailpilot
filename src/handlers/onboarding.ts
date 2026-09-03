@@ -47,3 +47,17 @@ export async function listVendorsHandler(event: any) {
     return jsonResponse(500, { error: err instanceof Error ? err.message : String(err) });
   }
 }
+export async function deleteProductHandler(event: any) {
+  try {
+    const userId = event.queryStringParameters?.userId;
+    const productId = event.queryStringParameters?.productId;
+    if (!userId || !productId) {
+      return jsonResponse(400, { error: "userId and productId are required" });
+    }
+    const { deleteProduct } = await import("../services/onboardingService");
+    await deleteProduct(userId, productId);
+    return jsonResponse(200, { success: true });
+  } catch (err) {
+    return jsonResponse(500, { error: err instanceof Error ? err.message : String(err) });
+  }
+}

@@ -16,6 +16,7 @@ function App() {
   const [storeName, setStoreName] = useState<string>("");
   const [page, setPage] = useState("home");
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     const savedId = localStorage.getItem("retailpilot_userId");
@@ -76,10 +77,17 @@ function App() {
     }
   }
 
-  return (
+    return (
     <div className="app-shell">
-      <Sidebar currentPage={page} onNavigate={setPage} storeName={storeName} onLogout={handleLogout} />
-      <div className="main-content">{renderPage()}</div>
+           {sidebarOpen && <Sidebar currentPage={page} onNavigate={setPage} storeName={storeName} />}
+      <div className="main-content">
+        <div className="topbar">
+          <button className="hamburger-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
+          <span className="topbar-store">{storeName}</span>
+          <button className="topbar-logout" onClick={handleLogout}>Log out</button>
+        </div>
+        {renderPage()}
+      </div>
     </div>
   );
 }

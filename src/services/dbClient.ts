@@ -32,3 +32,8 @@ export async function queryByPrefix(pk: string, skPrefix: string) {
   );
   return result.Items || [];
 }
+import { DeleteCommand } from "@aws-sdk/lib-dynamodb";
+
+export async function deleteItem(pk: string, sk: string) {
+  await docClient.send(new DeleteCommand({ TableName: TABLE_NAME, Key: { PK: pk, SK: sk } }));
+}

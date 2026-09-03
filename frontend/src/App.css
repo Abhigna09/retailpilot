@@ -547,3 +547,29 @@ input:focus, select:focus {
 .delete-btn:hover {
   background: #fef2f2;
 }
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 32px 0 32px;
+}
+
+.topbar-store {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.topbar-logout {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 13px;
+  padding: 7px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.topbar-logout:hover {
+  background: #f8fafc;
+}

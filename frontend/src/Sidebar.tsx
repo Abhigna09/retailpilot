@@ -2,7 +2,6 @@ interface Props {
   currentPage: string;
   onNavigate: (page: string) => void;
   storeName: string;
-  onLogout: () => void;
 }
 
 const mainItems = [
@@ -18,7 +17,7 @@ const inventoryItems = [
   { key: "sales", label: "Sales History" },
 ];
 
-export default function Sidebar({ currentPage, onNavigate, storeName, onLogout }: Props) {
+export default function Sidebar({ currentPage, onNavigate }: Props) {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -46,11 +45,6 @@ export default function Sidebar({ currentPage, onNavigate, storeName, onLogout }
           {item.label}
         </div>
       ))}
-
-      <div className="sidebar-footer">
-        <div className="sidebar-store-name">{storeName}</div>
-        <button className="sidebar-logout" onClick={onLogout}>Log out</button>
-      </div>
     </div>
   );
 }

@@ -10,8 +10,6 @@ export default function SalesHistory({ userId }: Props) {
   const [sales, setSales] = useState<any[]>([]);
   const [productId, setProductId] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [unitPrice, setUnitPrice] = useState("");
-  const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -28,11 +26,9 @@ export default function SalesHistory({ userId }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    await recordSale(userId, productId, Number(quantity));
+       await recordSale(userId, productId, Number(quantity));
     setLoading(false);
     setQuantity("");
-    setUnitPrice("");
-    setDate("");
     refresh();
   }
 
@@ -63,14 +59,7 @@ export default function SalesHistory({ userId }: Props) {
             <label>Quantity</label>
             <input type="number" placeholder="5" value={quantity} onChange={e => setQuantity(e.target.value)} required />
           </div>
-          <div className="form-field">
-            <label>Unit price (₹)</label>
-            <input type="number" placeholder="25" value={unitPrice} onChange={e => setUnitPrice(e.target.value)} />
-          </div>
-          <div className="form-field">
-            <label>Date</label>
-            <input type="date" value={date} onChange={e => setDate(e.target.value)} />
-          </div>
+         
           <button type="submit" disabled={loading} className="btn-primary">
             + {loading ? "Recording..." : "Record sale"}
           </button>

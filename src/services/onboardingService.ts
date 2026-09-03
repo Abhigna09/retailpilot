@@ -80,3 +80,7 @@ export async function listVendors(userId: string): Promise<Vendor[]> {
   const items = await queryByPrefix(`USER#${userId}`, "VENDOR#");
   return items as Vendor[];
 }
+export async function deleteProduct(userId: string, productId: string): Promise<void> {
+  const { deleteItem } = await import("./dbClient");
+  await deleteItem(`USER#${userId}`, `PRODUCT#${productId}`);
+}

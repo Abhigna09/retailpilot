@@ -230,6 +230,17 @@ export class RetailPilotStack extends cdk.Stack {
     const previewRes = api.root.addResource("preview-checks");
     previewRes.addMethod("POST", new apigateway.LambdaIntegration(previewChecksFn));
 
+        const deleteProductFn = new lambda.NodejsFunction(this, "DeleteProductFn", {
+      entry: path.join(__dirname, "../src/handlers/onboarding.ts"),
+      handler: "deleteProductHandler",
+      environment: sharedEnv,
+      runtime: lambda_.Runtime.NODEJS_20_X,
+    });
+    table.grantReadWriteData(deleteProductFn);
+
+    const productByIdRes = productsRes.addResource("{productId}");
+    productByIdRes.addMethod("DELETE", new apigateway.LambdaIntegration(deleteProductFn));
+
     new cdk.CfnOutput(this, "ApiUrl", { value: api.url });
 }
 }
