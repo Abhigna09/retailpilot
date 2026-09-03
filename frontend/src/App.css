@@ -534,3 +534,16 @@ input:focus, select:focus {
 .card.alert { border-left: 3px solid #dc2626; }
 .payment-headline { font-weight: 600; color: #0f172a; }
 .checks { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.delete-btn {
+  background: #fff;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #fef2f2;
+}

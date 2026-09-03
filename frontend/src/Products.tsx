@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { listProducts, listVendors, addProduct } from "./api";
+import { listProducts, listVendors, addProduct, deleteProduct } from "./api";
 
 interface Props {
   userId: string;
@@ -98,7 +98,7 @@ export default function Products({ userId }: Props) {
         </form>
       </div>
 
-      <div className="product-list">
+            <div className="product-list">
         {products.map((p: any) => (
           <div key={p.productId} className="list-row">
             <div>
@@ -110,10 +110,20 @@ export default function Products({ userId }: Props) {
               <span className={`badge ${p.currentStock > 20 ? "badge-healthy" : "badge-medium"}`}>
                 {p.currentStock > 20 ? "In stock" : "Low stock"}
               </span>
+              <button
+                className="delete-btn"
+                onClick={async () => {
+                  if (confirm(`Delete ${p.name}?`)) {
+                    await deleteProduct(userId, p.productId);
+                    refresh();
+                  }
+                }}
+              >
+                Delete
+              </button>
             </div>
           </div>
         ))}
       </div>
-    </div>
   );
 }

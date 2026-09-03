@@ -114,3 +114,9 @@ export async function previewChecks(product: any, vendor: any, request: any, rec
   });
   return res.json();
 }
+export async function deleteProduct(userId: string, productId: string) {
+  const res = await fetch(`${API_BASE}/products/${productId}?userId=${userId}`, {
+    method: "DELETE",
+  });
+  return res.json();
+}
