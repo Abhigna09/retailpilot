@@ -5,19 +5,21 @@ import { putItem, queryByPrefix } from "./dbClient";
 export interface AddExpiryBatchInput {
   userId: string;
   productId: string;
+  variantId: string;
   quantity: number;
   expiryDate: string;
 }
-
 export async function addExpiryBatch(input: AddExpiryBatchInput): Promise<ExpiryBatch> {
   const batchId = randomUUID();
 
-  const batch: ExpiryBatch = {
-    batchId,
-    productId: input.productId,
-    quantity: input.quantity,
-    expiryDate: input.expiryDate,
-  };
+ const batch: ExpiryBatch = {
+  batchId,
+  productId: input.productId,
+  variantId: input.variantId,
+  quantity: input.quantity,
+  expiryDate: input.expiryDate,
+  createdAt: new Date().toISOString(),
+};
 
   await putItem({
     PK: `USER#${input.userId}`,

@@ -114,11 +114,41 @@ export class RetailPilotStack extends cdk.Stack {
     table.grantReadWriteData(listProductsFn);
     table.grantReadWriteData(listVendorsFn);
 
-    const productsRes = api.root.addResource("products");
-    productsRes.addMethod("POST", new apigateway.LambdaIntegration(addProductFn));
-    productsRes.addMethod("GET", new apigateway.LambdaIntegration(listProductsFn));
+   const productsRes = api.root.addResource("products");
+productsRes.addMethod("POST", new apigateway.LambdaIntegration(addProductFn));
+productsRes.addMethod("GET", new apigateway.LambdaIntegration(listProductsFn));
 
-    const vendorsRes = api.root.addResource("vendors");
+const listVariantsFn = new lambda.NodejsFunction(this, "ListVariantsFn", {
+  entry: path.join(__dirname, "../src/handlers/onboarding.ts"),
+  handler: "listVariantsHandler",
+  environment: sharedEnv,
+  runtime: lambda_.Runtime.NODEJS_20_X,
+});
+
+table.grantReadWriteData(listVariantsFn);
+
+const variantsRes = api.root.addResource("variants");
+
+variantsRes.addMethod(
+  "GET",
+  new apigateway.LambdaIntegration(listVariantsFn)
+);
+
+const addVariantFn = new lambda.NodejsFunction(this, "AddVariantFn", {
+  entry: path.join(__dirname, "../src/handlers/onboarding.ts"),
+  handler: "addVariantHandler",
+  environment: sharedEnv,
+  runtime: lambda_.Runtime.NODEJS_20_X,
+});
+
+table.grantReadWriteData(addVariantFn);
+
+variantsRes.addMethod(
+  "POST",
+  new apigateway.LambdaIntegration(addVariantFn)
+);
+
+const vendorsRes = api.root.addResource("vendors");
     vendorsRes.addMethod("POST", new apigateway.LambdaIntegration(addVendorFn));
     vendorsRes.addMethod("GET", new apigateway.LambdaIntegration(listVendorsFn));
 

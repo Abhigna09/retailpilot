@@ -1,7 +1,11 @@
 import Razorpay from "razorpay";
 import { Product } from "../models/product";
 import { Vendor } from "../models/vendor";
-import { ReorderRequest, runAllSafetyChecks, SafetyCheckResult } from "./safetyChecks";
+import {
+  ReorderRequest,
+  runAllSafetyChecks,
+  SafetyCheckResult,
+} from "./safetyChecks";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -18,6 +22,7 @@ export interface AuditLogEntry {
   success: boolean;
   reason: string;
   razorpayOrderId?: string;
+  razorpayKeyId?: string;
 }
 
 export async function executeVendorPayment(
@@ -27,10 +32,20 @@ export async function executeVendorPayment(
   recentOrders: ReorderRequest[],
   poAmount: number
 ): Promise<AuditLogEntry> {
-  const checks = runAllSafetyChecks(product, vendor, request, recentOrders, poAmount);
-  const allPassed = checks.every(c => c.passed);
+  const checks = runAllSafetyChecks(
+    product,
+    vendor,
+    request,
+    recentOrders,
+    poAmount
+  );
 
-  const baseLog: Omit<AuditLogEntry, "success" | "reason" | "razorpayOrderId"> = {
+  const allPassed = checks.every((c) => c.passed);
+
+  const baseLog: Omit<
+    AuditLogEntry,
+    "success" | "reason" | "razorpayOrderId"
+  > = {
     timestamp: new Date().toISOString(),
     productId: product.productId,
     vendorId: vendor.vendorId,
@@ -39,9 +54,12 @@ export async function executeVendorPayment(
     safetyChecks: checks,
   };
 
-  // if any safety check fails, block payment entirely — no exceptions
   if (!allPassed) {
-    const failedReasons = checks.filter(c => !c.passed).map(c => c.reason).join(" | ");
+    const failedReasons = checks
+      .filter((c) => !c.passed)
+      .map((c) => c.reason)
+      .join(" | ");
+
     return {
       ...baseLog,
       success: false,
@@ -49,11 +67,9 @@ export async function executeVendorPayment(
     };
   }
 
-  // all checks passed — proceed with real Razorpay call
-    // all checks passed — proceed with real Razorpay call
   try {
     const order = await razorpay.orders.create({
-      amount: poAmount * 100, // Razorpay expects paise, not rupees
+      amount: poAmount * 100,
       currency: "INR",
       notes: {
         productId: product.productId,
@@ -62,29 +78,47 @@ export async function executeVendorPayment(
       },
     });
 
-    // real reorder means real stock increase — update the product record
+    // Current demo behavior:
+    // increase stock when the procurement order is created.
     const { putItem } = await import("./dbClient");
-    const newStock = product.currentStock + request.quantity;
+
+    const newStock =
+      product.currentStock + request.quantity;
+
     await putItem({
       PK: `USER#${product.userId}`,
       SK: `PRODUCT#${product.productId}`,
       ...product,
       currentStock: newStock,
     });
+
     return {
       ...baseLog,
       success: true,
-      reason: "Payment order created successfully after all safety checks passed.",
+      reason:
+        "Payment order created successfully after all safety checks passed.",
       razorpayOrderId: order.id,
+      razorpayKeyId: process.env.RAZORPAY_KEY_ID,
     };
-  } catch (err) {
+  } catch (err: any) {
+    console.error("Razorpay error:", err);
+
+    const razorpayError = err?.error;
+
+    const reason =
+      razorpayError?.description ||
+      razorpayError?.reason ||
+      err?.message ||
+      "Unknown Razorpay error";
+
     return {
       ...baseLog,
       success: false,
-      reason: `Razorpay error: ${err instanceof Error ? err.message : String(err)}`,
+      reason: `Razorpay error: ${reason}`,
     };
   }
 }
+
 export function previewSafetyChecks(
   product: Product,
   vendor: Vendor,
@@ -93,5 +127,12 @@ export function previewSafetyChecks(
   poAmount: number,
   maxAutoSpend: number = 10000
 ): SafetyCheckResult[] {
-  return runAllSafetyChecks(product, vendor, request, recentOrders, poAmount, maxAutoSpend);
+  return runAllSafetyChecks(
+    product,
+    vendor,
+    request,
+    recentOrders,
+    poAmount,
+    maxAutoSpend
+  );
 }

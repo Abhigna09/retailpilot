@@ -13,22 +13,26 @@ const mainItems = [
 const inventoryItems = [
   { key: "products", label: "Products" },
   { key: "vendors", label: "Vendors" },
-  { key: "expiry", label: "Product Expiry" },
-  { key: "sales", label: "Sales History" },
+  { key: "sales", label: "Sales" },
 ];
 
-export default function Sidebar({ currentPage, onNavigate }: Props) {
+export default function Sidebar({
+  currentPage,
+  onNavigate,
+}: Props) {
   return (
     <div className="sidebar">
-      <div className="sidebar-header">
-        <span className="sidebar-logo">RetailPilot</span>
-      </div>
-
+    <div className="sidebar-header">
+  <span className="sidebar-logo">RetailPilot</span>
+</div>  
       <div className="sidebar-section-label">MAIN</div>
-      {mainItems.map(item => (
+
+      {mainItems.map((item) => (
         <div
           key={item.key}
-          className={`sidebar-item ${currentPage === item.key ? "active" : ""}`}
+          className={`sidebar-item ${
+            currentPage === item.key ? "active" : ""
+          }`}
           onClick={() => onNavigate(item.key)}
         >
           {item.label}
@@ -36,10 +40,13 @@ export default function Sidebar({ currentPage, onNavigate }: Props) {
       ))}
 
       <div className="sidebar-section-label">INVENTORY</div>
-      {inventoryItems.map(item => (
+
+      {inventoryItems.map((item) => (
         <div
           key={item.key}
-          className={`sidebar-item ${currentPage === item.key ? "active" : ""}`}
+          className={`sidebar-item ${
+            currentPage === item.key ? "active" : ""
+          }`}
           onClick={() => onNavigate(item.key)}
         >
           {item.label}

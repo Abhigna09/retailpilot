@@ -40,25 +40,77 @@ export async function listProducts(userId: string) {
   const res = await fetch(`${API_BASE}/products?userId=${userId}`);
   return res.json();
 }
+export async function listVariants(userId: string, productId: string) {
+  const res = await fetch(
+    `${API_BASE}/variants?userId=${userId}&productId=${productId}`
+  );
+  return res.json();
+}
+export async function addVariant(input: {
+  userId: string;
+  productId: string;
+  name: string;
+  unit: string;
+  costPrice: number;
+  sellPrice?: number;
+  currentStock: number;
+  expiryDate: string;
+}) {
+  const res = await fetch(`${API_BASE}/variants`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
 
+  return res.json();
+}
 export async function listVendors(userId: string) {
   const res = await fetch(`${API_BASE}/vendors?userId=${userId}`);
   return res.json();
 }
 
-export async function reviewProduct(userId: string, productId: string, sales: any[], expiryBatches: any[], retries = 2): Promise<any> {
+export async function reviewProduct(
+  userId: string,
+  productId: string,
+  sales: any[],
+  expiryBatches: any[],
+  retries = 2
+): Promise<any> {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const res = await fetch(`${API_BASE}/review?userId=${userId}&productId=${productId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sales, expiryBatches }),
-      });
-      if (!res.ok) throw new Error(`Status ${res.status}`);
+      const res = await fetch(
+        `${API_BASE}/review?userId=${userId}&productId=${productId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sales,
+            expiryBatches,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const errorBody = await res.text();
+
+        throw new Error(
+          `Status ${res.status}: ${errorBody}`
+        );
+      }
+
       return res.json();
     } catch (err) {
-      if (attempt === retries) throw err;
-      await new Promise(r => setTimeout(r, 800));
+      if (attempt === retries) {
+        throw err;
+      }
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, 800)
+      );
     }
   }
 }
@@ -71,15 +123,25 @@ export async function executePayment(input: any) {
   });
   return res.json();
 }
-export async function recordSale(userId: string, productId: string, unitsSold: number) {
+export async function recordSale(
+  userId: string,
+  productId: string,
+  variantId: string,
+  unitsSold: number
+) {
   const res = await fetch(`${API_BASE}/sales`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId, productId, unitsSold }),
+    body: JSON.stringify({
+      userId,
+      productId,
+      variantId,
+      unitsSold,
+    }),
   });
+
   return res.json();
 }
-
 export async function addExpiryBatch(userId: string, productId: string, quantity: number, expiryDate: string) {
   const res = await fetch(`${API_BASE}/expiry`, {
     method: "POST",

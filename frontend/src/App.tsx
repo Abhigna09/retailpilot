@@ -77,15 +77,38 @@ function App() {
     }
   }
 
-    return (
+      return (
     <div className="app-shell">
-           {sidebarOpen && <Sidebar currentPage={page} onNavigate={setPage} storeName={storeName} />}
+      {sidebarOpen && (
+        <Sidebar
+          currentPage={page}
+          onNavigate={setPage}
+          storeName={storeName}
+        />
+      )}
+
       <div className="main-content">
-        <div className="topbar">
-          <button className="hamburger-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
-          <span className="topbar-store">{storeName}</span>
-          <button className="topbar-logout" onClick={handleLogout}>Log out</button>
-        </div>
+      <div className="topbar">
+  <button
+    className="hamburger-btn"
+    onClick={() => setSidebarOpen(!sidebarOpen)}
+    aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+  >
+    ☰
+  </button>
+
+  <div className="topbar-right">
+    <span className="topbar-store">{storeName}</span>
+
+    <button
+      className="topbar-logout"
+      onClick={handleLogout}
+    >
+      Log out
+    </button>
+  </div>
+</div>
+
         {renderPage()}
       </div>
     </div>

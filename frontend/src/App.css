@@ -26,7 +26,10 @@ body {
 }
 
 .sidebar-header {
-  padding: 0 20px 20px 20px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px 20px 76px;
   border-bottom: 1px solid #e2e8f0;
   margin-bottom: 16px;
 }
@@ -204,6 +207,11 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+}
+.receipt-block{
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid #e5e87eb;
 }
 
 /* Tabs */
@@ -547,19 +555,56 @@ input:focus, select:focus {
 .delete-btn:hover {
   background: #fef2f2;
 }
+/* Top bar */
 .topbar {
+  height: 64px;
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  gap: 16px;
-  padding: 16px 32px 0 32px;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.hamburger-btn {
+  position: fixed;
+  top: 16px;
+  left: 24px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 50;
+}
+
+.hamburger-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
 }
 
 .topbar-store {
+  margin-left: auto;
+  margin-right: 16px;
   font-size: 13px;
   color: #64748b;
 }
-
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
 .topbar-logout {
   background: #fff;
   border: 1px solid #e2e8f0;
@@ -572,4 +617,90 @@ input:focus, select:focus {
 
 .topbar-logout:hover {
   background: #f8fafc;
+}
+
+/* Responsive app shell */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 30;
+  }
+
+  .topbar {
+    padding: 0 16px;
+  }
+
+  .page {
+    padding: 28px 20px;
+  }
+}        
+/* Sales Overview */
+.sales-metrics {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.sales-main-metric,
+.sales-small-metric {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.sales-main-metric .revenue-value {
+  font-size: 30px;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sales-chart-section {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 22px;
+}
+
+.chart-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.sales-chart {
+  width: 100%;
+  height: 260px;
+}
+.sales-chart-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Sales Overview responsive layout */
+@media (max-width: 700px) {
+  .sales-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sales-main-metric {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 450px) {
+  .sales-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .sales-main-metric {
+    grid-column: span 1;
+  }
 }
